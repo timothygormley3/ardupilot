@@ -1,4 +1,4 @@
-#include "Plane.h"
+﻿#include "Plane.h"
 #include <AP_RSSI/AP_RSSI.h>
 
 void Plane::init_barometer(bool full_calibration)
@@ -231,6 +231,9 @@ void Plane::update_sensor_status_flags(void)
 
     switch (control_mode) {
     case MANUAL:
+    //UWAFSL START
+    case UWSTABILIZE:
+    //UWAFSL END
         break;
 
     case ACRO:

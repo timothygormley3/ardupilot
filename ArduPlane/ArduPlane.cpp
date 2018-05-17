@@ -1,4 +1,4 @@
-/*
+﻿/*
    Lead developer: Andrew Tridgell
  
    Authors:    Doug Weibel, Jose Julio, Jordi Munoz, Jason Short, Randy Mackay, Pat Hickey, John Arne Birkeland, Olivier Adler, Amilcar Lucas, Gregory Fletcher, Paul Riseborough, Brandon Jones, Jon Challinger
@@ -780,6 +780,30 @@ void Plane::update_flight_mode(void)
         }
         break;
     }
+
+    //UWAFSL START
+    case UWSTABILIZE: {
+        //Extract bank angle
+        double phi = ahrs.roll; // rad
+
+        double phi_cmd = 0;     //hold wings level
+        double phi_e = phi - phi_cmd;
+
+        //implement control law
+        double KPhi = g.kp_phi;      //rad/rad (use the custom parameter so this can be changed on the fly without requiring rebuilding the code)
+        double dA = -KPhi*phi_e;
+
+        // Set RC output channels to control surface deflections
+        double pi = 3.14159;
+        double scale_factor_r2cd = 100 * 180 / pi; // scale factor to convert radians to centidegrees
+        SRV_Channels::set_output_scaled(SRV_Channel::k_aileron, -dA * scale_factor_r2cd); //centidegrees
+
+        //Manual control for elevator and rudder
+        SRV_Channels::set_output_scaled(SRV_Channel::k_elevator, channel_pitch->get_control_in_zero_dz());
+        steering_control.steering = steering_control.rudder = channel_rudder->get_control_in_zero_dz();
+        break;
+    }
+    //UWAFSL END
         
     case INITIALISING:
         // handled elsewhere
@@ -863,6 +887,9 @@ void Plane::update_navigation()
     case QLOITER:
     case QLAND:
     case QRTL:
+    //UWAFSL START
+    case UWSTABILIZE:
+    //UWAFSL END
         // nothing to do
         break;
     }

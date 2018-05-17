@@ -1,4 +1,4 @@
-#include "GCS_Mavlink.h"
+﻿#include "GCS_Mavlink.h"
 
 #include "Plane.h"
 #include "version.h"
@@ -31,6 +31,9 @@ void Plane::send_heartbeat(mavlink_channel_t chan)
     case MANUAL:
     case TRAINING:
     case ACRO:
+    //UWAFSL START
+    case UWSTABILIZE:
+    //UWAFSL END
         base_mode = MAV_MODE_FLAG_MANUAL_INPUT_ENABLED;
         break;
     case STABILIZE:
